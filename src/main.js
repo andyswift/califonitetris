@@ -183,23 +183,48 @@ $('start').addEventListener('click', startGame);
 $('again').addEventListener('click', startGame);
 $('pause').addEventListener('click', togglePause);
 
-// touch buttons: hold for left/right/down, tap for rotate and meta
-for (const btn of document.querySelectorAll('.touch button')) {
+// D-pad: one touch surface, so sliding a thumb from left to down switches direction.
+const dpad = document.querySelector('.dpad');
+const arms = [...dpad.querySelectorAll('.arm')];
+let dpadDir = null;
+function setDpad(dir) {
+  if (dir === dpadDir) return;
+  keys.left = dir === 'left';
+  keys.right = dir === 'right';
+  keys.down = dir === 'down';
+  if (dir === 'up') pressed.a = true;
+  for (const a of arms) a.classList.toggle('on', a.dataset.d === dir);
+  dpadDir = dir;
+}
+function dirAt(e) {
+  const r = dpad.getBoundingClientRect();
+  const dx = (e.clientX - (r.left + r.width / 2)) / r.width;
+  const dy = (e.clientY - (r.top + r.height / 2)) / r.height;
+  if (Math.hypot(dx, dy) < 0.12) return null;
+  return Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : dy < 0 ? 'up' : 'down';
+}
+dpad.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  audio.resume();
+  dpad.setPointerCapture(e.pointerId);
+  setDpad(dirAt(e));
+});
+dpad.addEventListener('pointermove', (e) => { if (dpad.hasPointerCapture(e.pointerId)) setDpad(dirAt(e)); });
+for (const t of ['pointerup', 'pointercancel', 'lostpointercapture']) dpad.addEventListener(t, () => setDpad(null));
+
+// A, B, pause, music: tap
+for (const btn of document.querySelectorAll('.touch button[data-k]')) {
   const k = btn.dataset.k;
-  const down = (e) => {
+  btn.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     audio.resume();
     btn.classList.add('on');
     if (k === 'pause') togglePause();
     else if (k === 'mute') audio.toggleMute();
-    else if (k === 'a' || k === 'b') pressed[k] = true;
-    else keys[k] = true;
-  };
-  const up = () => { btn.classList.remove('on'); if (k in keys) keys[k] = false; };
-  btn.addEventListener('pointerdown', down);
-  btn.addEventListener('pointerup', up);
-  btn.addEventListener('pointercancel', up);
-  btn.addEventListener('pointerleave', up);
+    else pressed[k] = true;
+  });
+  const up = () => btn.classList.remove('on');
+  for (const t of ['pointerup', 'pointercancel', 'pointerleave']) btn.addEventListener(t, up);
 }
 
 // ---------- main loop: fixed 60 Hz logic, render every animation frame ----------
