@@ -10,8 +10,8 @@
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; overflow: hidden; background: #10605F; overscroll-behavior: none; }
-body { position: relative; font-family: var(--sans); color: var(--ink); -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+html, body { margin: 0; height: 100%; height: 100dvh; overflow: hidden; background: #10605F; overscroll-behavior: none; }
+body { position: relative; font-family: var(--sans); color: var(--ink); -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
 /* The stage is a fixed-size design canvas; main.js scales it to fit the window. */
 .stage {
@@ -119,3 +119,23 @@ body { position: relative; font-family: var(--sans); color: var(--ink); -webkit-
 .pad.ab button { background: var(--coral); color: var(--sand); }
 .meta { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
 .touch .pill { width: 88px; height: 40px; border-radius: 20px; font-size: 10px; }
+
+/* landscape phones: shorter stage, controls either side of the handheld */
+.stage.land-touch { height: 600px; }
+.land-touch .masthead { display: none; }
+.land-touch .handheld { top: 10px; }
+.land-touch .touch { display: block; position: absolute; inset: 0; padding: 0; pointer-events: none; }
+.land-touch .touch > * { position: absolute; pointer-events: auto; }
+.land-touch .pad:not(.ab) { left: 8px; top: 250px; gap: 8px; }
+.land-touch .pad.ab { right: 12px; top: 250px; margin: 0; gap: 12px; }
+.land-touch .meta { right: 12px; top: 16px; margin: 0; }
+.land-touch .touch button { width: 74px; height: 74px; }
+.land-touch .touch .pill { width: 96px; height: 44px; }
+.land-touch .title .logo { top: 24px; } .land-touch .title .l1, .land-touch .title .l2 { font-size: 48px; }
+.land-touch .title .sub { margin-top: 14px; }
+.land-touch .levelbox { top: 290px; }
+.land-touch .press { top: 470px; } .land-touch .help { top: 530px; }
+.land-touch .over .card { top: 50px; } .land-touch .pause .card { top: 200px; }
+.land-touch .sun { top: 250px; } .land-touch .sea, .land-touch .s1 { top: 338px; } .land-touch .s2 { top: 372px; } .land-touch .s3 { top: 412px; }
+
+.is-touch .help, .is-touch .keys { display: none; }

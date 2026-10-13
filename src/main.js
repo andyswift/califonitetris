@@ -27,14 +27,30 @@ let last = performance.now();
 const pad = (n, w) => String(n).padStart(w, '0');
 
 // ---------- layout: scale the fixed stage to the window ----------
+const isTouch = window.matchMedia('(pointer: coarse)').matches;
+if (isTouch) {
+  stage.classList.add('is-touch');
+  $('start').textContent = 'TAP TO START';
+  $('again').textContent = 'TAP TO PLAY';
+  document.querySelector('#over .sub.small').textContent = 'TO PADDLE BACK OUT';
+  document.querySelector('#pause .sub').textContent = 'TAP TO RESUME';
+}
+
 function fit() {
+  const touch = isTouch;
   const portrait = window.innerHeight > window.innerWidth * 1.1;
+  const land = touch && !portrait;
   stage.classList.toggle('portrait', portrait);
+  stage.classList.toggle('land-touch', land);
   const w = portrait ? 480 : 960;
-  const h = portrait ? 940 : 720;
+  const h = portrait ? 940 : land ? 600 : 720;
   stage.style.transform = `translate(-50%, -50%) scale(${Math.min(window.innerWidth / w, window.innerHeight / h)})`;
 }
 window.addEventListener('resize', fit);
+window.addEventListener('orientationchange', fit);
+window.visualViewport?.addEventListener('resize', fit);
+// no long-press menus or text selection while holding the on-screen buttons
+window.addEventListener('contextmenu', (e) => e.preventDefault());
 fit();
 
 // ---------- screens ----------
